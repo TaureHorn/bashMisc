@@ -23,10 +23,10 @@ ${2?: You must supply a file or folder}
 #   TODO add ability to parse file / directory input from outside local directory >>> basename?
 #    
 getPassHash() {
-    local pass
-    read -sp "Password: " pass
-    local hash="$(echo $pass | sha256sum)"
-    HASHED_PASS=$(printf '%s\n' "${hash%%" -"}") #remove trailing " -" from hash
+    local PASS
+    read -sp "Password: " PASS
+    local HASH="$(echo $PASS | sha256sum)"
+    HASHED_PASS=$(printf '%s\n' "${HASH%%" -"}") #remove trailing " -" from hash
 }
 decrypter() {
     getPassHash
@@ -60,7 +60,7 @@ then
 
 elif [[ $1 == "--encrypt" || $1 == "-e" || $1 == "encrypt" ]]
 then
-    encrypter $1 $2 $3
+    encrypter $1 $2
 fi
 
 deleter() {
@@ -74,6 +74,3 @@ if [[ -n "$3" ]]
 then
     deleter $3 $2
 fi
-
-
-
