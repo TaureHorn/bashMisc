@@ -48,13 +48,18 @@ HELP() {
     echo -e '  -r         delete the original file on success \n'
 }
 getPassHash() {
-    local KEY
-    read -sp "Secret key: `echo $'\n> '`" KEY
-    local HASH="$(echo $KEY | sha256sum)"
-    HASHED_KEY=$(printf '%s\n' "${HASH%%" -"}") #remove trailing " -" from hash
+    if [[ $XARG_HASH == 1 ]]; then 
+        HASHED_KEY=$(cat $3)
+        echo $HASHED_KEY
+    else
+        local KEY
+        read -sp "Secret key: `echo $'\n> '`" KEY
+        local HASH="$(echo $KEY | sha256sum)"
+        HASHED_KEY=$(printf '%s\n' "${HASH%%" -"}") #remove trailing " -" from hash
+    fi
 }
 decrypter() {
-    getPassHash
+    getPassHash $@
     local NAME="${2%%.*}"
     $(gpg --output $NAME.tar.gz --batch --decrypt --passphrase $HASHED_KEY $2)
     if [[ -f "$NAME.tar.gz" ]]
@@ -86,7 +91,7 @@ encrypter() {
         exit
     fi
 
-    getPassHash
+    getPassHash $@
     if [[ -f "$NAME.tar.gz" ]]; then
         $(gpg --cipher-algo AES256 --batch --symmetric --output $NAME.gpg --passphrase $HASHED_KEY $NAME.tar.gz)
         $(rm $NAME.tar.gz)
@@ -102,19 +107,26 @@ encrypter() {
 if [[ $# == 0 ]]; then
     echo 'krypter: You must specify which mode you want to run and which file or directory you want to target'
     echo "Try 'krypter -h' for more information"
+    exit
 elif [[ $# == 1 && $1 != "-h" ]]; then
     echo 'krypter: Two arguments are required, a mode and a file or directory'
     echo "Try 'krypter -h' for more information"
-elif [[ $# > 2 ]]; then
+    exit
+elif [[ $# -gt 3 ]]; then
     echo 'krypter: Too many arguments'
     echo "Try 'krypter -h' for more information"
+    exit
 fi
-# argument parser
-while getopts 'hred' OPTION; do
+
+# ARGUMENT PARSER
+while getopts 'hfred' OPTION; do
     case $OPTION in
         h) # print help
             HELP
             exit;;
+        f) # feed in file for password hash
+            XARG_HASH=1
+            ;;
         r) # delete orignal file on process completion
             DELETE_MODE=1;;
         e) # encrypt file
@@ -127,7 +139,13 @@ while getopts 'hred' OPTION; do
     esac
 done
 
-# function triggers
+# HASH INPUT CHECKER
+if [[ $XARG_HASH == 1 && $# -lt 3 ]]; then
+    echo 'krypter: You must pass in a file to use as a hash'
+    exit
+fi
+
+# FUNCTION TRIGGERS
 if [[ $MODE == 0 ]]; then
     encrypter $@
 elif [[ $MODE == 1 ]]; then
@@ -135,7 +153,6 @@ elif [[ $MODE == 1 ]]; then
 fi
 
 # DELETE CHECKER AND TRIGGER
-#
 if [[ $DELETE_MODE == 1 && $SUCCESS == 1 ]]; then
     $(rm -rf $2)
 fi
