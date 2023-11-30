@@ -1,0 +1,16 @@
+{
+  "name": "obsidian-json-helper",
+  "version": "1.0.0",
+  "description": "",
+  "main": "NPC_JSON-importer_helper.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "extract": "echo \"Lets a gooooo\""
+  },
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "handlebars": "^4.7.8"
+  }
+}

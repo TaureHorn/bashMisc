@@ -4,7 +4,7 @@
 # =======================================================================================================================
 # 
 #   SYNOPSIS
-#       krypter -der file
+#       krypter -derf file secret-key
 #       
 #   DESCRIPTION
 #       A script that takes to either encrypt or decrypt a file
@@ -16,13 +16,14 @@
 #       -d,     decrypt file
 #       -e,     encypt file/ directory 
 #       -r,     delete the original file on success
+#       -f,     provide a secret key from a fil
 #
 #   EXAMPLES
 #       krypter -e sensitive-file.txt
 #       krypter -er ./nudes/
 #       krypter -d video-tapes.gpg
 #
-#   Version=1.0
+#   Version=1.1
 #   TODO's ------------------------------------------------------------
 #       add checks to alert if tar or gpg are not installed
 #
