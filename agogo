@@ -1,0 +1,16 @@
+#! /usr/bin/env bash
+#
+# provide a name as $1 and the script will auto make a number of files to kickstart a small go project
+
+if [ -n $1 ]; then
+    NAME="$1"
+    echo "package main" >> "$NAME.go"
+    echo -e "package main\nimport \"testing\"" >> "$NAME"_test.go
+    go mod init "$NAME"
+    git init --initial-branch=0_"$NAME"
+    git add .
+    git commit -m "init"
+else
+    printf "You need to supply a name\n"
+fi
+
